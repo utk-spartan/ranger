@@ -665,12 +665,18 @@ public class RangerSystemAccessControl
 
   @Override
   public void checkCanReadSystemInformation(SystemSecurityContext context) {
-    SystemAccessControl.super.checkCanReadSystemInformation(context);
+    if (!hasPermission(createUserResource(context.getIdentity().getUser()), context, TrinoAccessType.IMPERSONATE)) {
+      LOG.debug("RangerSystemAccessControl.checkCanReadSystemInformation(" + context.getIdentity().getUser() + ") denied");
+      AccessDeniedException.denyImpersonateUser(context.getIdentity().getUser(), "trino");
+    }
   }
 
   @Override
   public void checkCanWriteSystemInformation(SystemSecurityContext context) {
-    SystemAccessControl.super.checkCanWriteSystemInformation(context);
+    if (!hasPermission(createUserResource(context.getIdentity().getUser()), context, TrinoAccessType.IMPERSONATE)) {
+      LOG.debug("RangerSystemAccessControl.checkCanWriteSystemInformation(" + context.getIdentity().getUser() + ") denied");
+      AccessDeniedException.denyImpersonateUser(context.getIdentity().getUser(), "trino");
+    }
   }
 
   /** FUNCTIONS **/

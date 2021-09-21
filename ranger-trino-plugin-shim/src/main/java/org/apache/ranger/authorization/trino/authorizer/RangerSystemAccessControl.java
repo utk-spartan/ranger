@@ -451,16 +451,6 @@ public class RangerSystemAccessControl
   }
 
   @Override
-  public void checkCanShowRoles(SystemSecurityContext context, String catalogName) {
-    try {
-      activatePluginClassLoader();
-      systemAccessControlImpl.checkCanShowRoles(context, catalogName);
-    } finally {
-      deactivatePluginClassLoader();
-    }
-  }
-
-  @Override
   public Optional<ViewExpression> getRowFilter(SystemSecurityContext context, CatalogSchemaTableName tableName) {
     Optional<ViewExpression> viewExpression;
     try {

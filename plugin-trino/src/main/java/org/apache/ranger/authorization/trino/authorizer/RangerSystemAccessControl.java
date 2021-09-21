@@ -311,15 +311,6 @@ public class RangerSystemAccessControl
   }
 
   @Override
-  public void checkCanShowRoles(SystemSecurityContext context, String catalogName) {
-    if (!hasPermission(createResource(catalogName), context, TrinoAccessType.SHOW)) {
-      LOG.debug("RangerSystemAccessControl.checkCanShowRoles(" + catalogName + ") denied");
-      AccessDeniedException.denyShowRoles(catalogName);
-    }
-  }
-
-
-  @Override
   public void checkCanAccessCatalog(SystemSecurityContext context, String catalogName) {
     if (!hasPermission(createResource(catalogName), context, TrinoAccessType.USE)) {
       LOG.debug("RangerSystemAccessControl.checkCanAccessCatalog(" + catalogName + ") denied");

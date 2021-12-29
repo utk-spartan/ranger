@@ -22,6 +22,19 @@ Apache Ranger is currently NOT setup to use pull requests to take in the changes
 Please use the apache review board to submit your code changes for review and commit. https://reviews.apache.org
 Also create a jira to go along with the review and mention it in the review board review. https://issues.apache.org/jira/browse/RANGER
 
+
+
+#### For compiling ranger
+mvn compile package assembly:assembly -DskipJSTests -DskipTests -Drat.skip=true -Dmaven.artifact.threads=20 --batch-mode -Pranger-hive-plugin  
+mvn compile package assembly:assembly -DskipJSTests -DskipTests -Drat.skip=true -Dmaven.artifact.threads=20 --batch-mode -Pranger-presto-plugin  
+mvn compile package assembly:assembly -DskipJSTests -DskipTests -Drat.skip=true -Dmaven.artifact.threads=20 --batch-mode -Pranger-trino-plugin  
+-- for ranger admin compile
+mvn compile package assembly:assembly -DskipJSTests -DskipTests -Drat.skip=true -Dmaven.artifact.threads=20 --batch-mode -Pall  
+
+----NOTE: for version >=2.1.x , assembly:assembly phase is part of package and will error out if explicitly run with package  
+
+--- Note: Check `distro` module, it is responsible for creating plugin `tar.gz` it needs to run at the end of all modules. It can be configured to selectively build certain plugins.
+
 Updated Build Process
 ====================
 Note:

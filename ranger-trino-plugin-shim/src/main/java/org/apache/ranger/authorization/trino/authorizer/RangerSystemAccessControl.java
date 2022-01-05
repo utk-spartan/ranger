@@ -17,20 +17,13 @@ import io.trino.spi.connector.CatalogSchemaName;
 import io.trino.spi.connector.CatalogSchemaRoutineName;
 import io.trino.spi.connector.CatalogSchemaTableName;
 import io.trino.spi.connector.SchemaTableName;
-import io.trino.spi.security.TrinoPrincipal;
-import io.trino.spi.security.Privilege;
-import io.trino.spi.security.SystemAccessControl;
-import io.trino.spi.security.SystemSecurityContext;
-import io.trino.spi.security.ViewExpression;
+import io.trino.spi.security.*;
 import io.trino.spi.type.Type;
 import org.apache.ranger.plugin.classloader.RangerPluginClassLoader;
 
 import javax.inject.Inject;
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public class RangerSystemAccessControl
   implements SystemAccessControl {
@@ -155,10 +148,10 @@ public class RangerSystemAccessControl
   }
 
   @Override
-  public void checkCanCreateTable(SystemSecurityContext context, CatalogSchemaTableName table) {
+  public void checkCanCreateTable(SystemSecurityContext context, CatalogSchemaTableName table, Map<String, Object> properties) {
     try {
       activatePluginClassLoader();
-      systemAccessControlImpl.checkCanCreateTable(context, table);
+      systemAccessControlImpl.checkCanCreateTable(context, table, properties);
     } finally {
       deactivatePluginClassLoader();
     }
@@ -237,6 +230,18 @@ public class RangerSystemAccessControl
   }
 
   @Override
+  public void checkCanSetTableProperties(
+          SystemSecurityContext context, CatalogSchemaTableName table, Map<String, Object> properties
+  ) {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanSetTableProperties(context, table, properties);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+  @Override
   public void checkCanInsertIntoTable(SystemSecurityContext context, CatalogSchemaTableName table) {
     try {
       activatePluginClassLoader();
@@ -251,6 +256,16 @@ public class RangerSystemAccessControl
     try {
       activatePluginClassLoader();
       systemAccessControlImpl.checkCanDeleteFromTable(context, table);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+  @Override
+  public void checkCanTruncateTable(SystemSecurityContext context, CatalogSchemaTableName table) {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanTruncateTable(context, table);
     } finally {
       deactivatePluginClassLoader();
     }
@@ -317,7 +332,7 @@ public class RangerSystemAccessControl
   }
 
   @Override
-  public void checkCanViewQueryOwnedBy(SystemSecurityContext context, String queryOwner) {
+  public void checkCanViewQueryOwnedBy(SystemSecurityContext context, Identity queryOwner) {
     try {
       activatePluginClassLoader();
       systemAccessControlImpl.checkCanViewQueryOwnedBy(context, queryOwner);
@@ -339,7 +354,7 @@ public class RangerSystemAccessControl
   }
 
   @Override
-  public void checkCanKillQueryOwnedBy(SystemSecurityContext context, String queryOwner) {
+  public void checkCanKillQueryOwnedBy(SystemSecurityContext context, Identity queryOwner) {
     try {
       activatePluginClassLoader();
       systemAccessControlImpl.checkCanKillQueryOwnedBy(context, queryOwner);
@@ -519,6 +534,16 @@ public class RangerSystemAccessControl
     try {
       activatePluginClassLoader();
       systemAccessControlImpl.checkCanExecuteProcedure(systemSecurityContext, procedure);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
+  @Override
+  public void checkCanExecuteTableProcedure(SystemSecurityContext systemSecurityContext, CatalogSchemaTableName table, String procedure) {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanExecuteTableProcedure(systemSecurityContext, table, procedure);
     } finally {
       deactivatePluginClassLoader();
     }

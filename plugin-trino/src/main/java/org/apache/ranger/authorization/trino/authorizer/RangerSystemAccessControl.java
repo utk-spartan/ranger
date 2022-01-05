@@ -24,6 +24,7 @@ import io.trino.spi.connector.CatalogSchemaTableName;
 import io.trino.spi.connector.SchemaTableName;
 import io.trino.spi.eventlistener.EventListener;
 import io.trino.spi.security.AccessDeniedException;
+import io.trino.spi.security.Identity;
 import io.trino.spi.security.TrinoPrincipal;
 import io.trino.spi.security.Privilege;
 import io.trino.spi.security.SystemAccessControl;
@@ -399,10 +400,11 @@ public class RangerSystemAccessControl
   }
 
   /**
-   * Create table is verified on schema level
+   * Check if identity is allowed to create the specified table with properties in a catalog.
+   *
    */
   @Override
-  public void checkCanCreateTable(SystemSecurityContext context, CatalogSchemaTableName table) {
+  public void checkCanCreateTable(SystemSecurityContext context, CatalogSchemaTableName table, Map<String, Object> properties) {
     if (!hasPermission(createResource(table.getCatalogName(), table.getSchemaTableName().getSchemaName()), context, TrinoAccessType.CREATE)) {
       LOG.debug("RangerSystemAccessControl.checkCanCreateTable(" + table.getSchemaTableName().getTableName() + ") denied");
       AccessDeniedException.denyCreateTable(table.getSchemaTableName().getTableName());
@@ -433,6 +435,20 @@ public class RangerSystemAccessControl
   }
 
   @Override
+  public void checkCanSetTableProperties(
+          SystemSecurityContext context, CatalogSchemaTableName table, Map<String, Object> properties
+  ) {
+    RangerTrinoResource res = createResource(table);
+    if (
+            !hasPermission(res, context, TrinoAccessType.ALTER)
+      // && !hasPermission(createProcedureResource(procedure), context, TrinoAccessType.EXECUTE)
+    ) {
+      LOG.debug("RangerSystemAccessControl.checkCanSetTableProperties(" + table.getSchemaTableName().getTableName() + ") denied");
+      AccessDeniedException.denySetTableProperties(table.getSchemaTableName().getTableName());
+    }
+  }
+
+  @Override
   public void checkCanInsertIntoTable(SystemSecurityContext context, CatalogSchemaTableName table) {
     RangerTrinoResource res = createResource(table);
     if (!hasPermission(res, context, TrinoAccessType.INSERT)) {
@@ -446,6 +462,14 @@ public class RangerSystemAccessControl
     if (!hasPermission(createResource(table), context, TrinoAccessType.DELETE)) {
       LOG.debug("RangerSystemAccessControl.checkCanDeleteFromTable(" + table.getSchemaTableName().getTableName() + ") denied");
       AccessDeniedException.denyDeleteTable(table.getSchemaTableName().getTableName());
+    }
+  }
+
+  @Override
+  public void checkCanTruncateTable(SystemSecurityContext context, CatalogSchemaTableName table) {
+    if (!hasPermission(createResource(table), context, TrinoAccessType.DELETE)) {
+      LOG.debug("RangerSystemAccessControl.checkCanTruncateTable(" + table.getSchemaTableName().getTableName() + ") denied");
+      AccessDeniedException.denyTruncateTable(table.getSchemaTableName().getTableName());
     }
   }
 
@@ -631,10 +655,10 @@ public class RangerSystemAccessControl
   }
 
   @Override
-  public void checkCanViewQueryOwnedBy(SystemSecurityContext context, String queryOwner) {
-    if (!hasPermission(createUserResource(queryOwner), context, TrinoAccessType.IMPERSONATE)) {
+  public void checkCanViewQueryOwnedBy(SystemSecurityContext context, Identity queryOwner) {
+    if (!hasPermission(createUserResource(queryOwner.getUser()), context, TrinoAccessType.IMPERSONATE)) {
       LOG.debug("RangerSystemAccessControl.checkCanViewQueryOwnedBy(" + queryOwner + ") denied");
-      AccessDeniedException.denyImpersonateUser(context.getIdentity().getUser(), queryOwner);
+      AccessDeniedException.denyImpersonateUser(context.getIdentity().getUser(), queryOwner.getUser());
     }
   }
 
@@ -647,10 +671,10 @@ public class RangerSystemAccessControl
   }
 
   @Override
-  public void checkCanKillQueryOwnedBy(SystemSecurityContext context, String queryOwner) {
-    if (!hasPermission(createUserResource(queryOwner), context, TrinoAccessType.IMPERSONATE)) {
+  public void checkCanKillQueryOwnedBy(SystemSecurityContext context, Identity queryOwner) {
+    if (!hasPermission(createUserResource(queryOwner.getUser()), context, TrinoAccessType.IMPERSONATE)) {
       LOG.debug("RangerSystemAccessControl.checkCanKillQueryOwnedBy(" + queryOwner + ") denied");
-      AccessDeniedException.denyImpersonateUser(context.getIdentity().getUser(), queryOwner);
+      AccessDeniedException.denyImpersonateUser(context.getIdentity().getUser(), queryOwner.getUser());
     }
   }
 
@@ -693,6 +717,24 @@ public class RangerSystemAccessControl
     if (!hasPermission(createProcedureResource(procedure), context, TrinoAccessType.EXECUTE)) {
       LOG.debug("RangerSystemAccessControl.checkCanExecuteFunction(" + procedure.getSchemaRoutineName().getRoutineName() + ") denied");
       AccessDeniedException.denyExecuteProcedure(procedure.getSchemaRoutineName().getRoutineName());
+    }
+  }
+
+  /**
+   * Check if identity is allowed to execute the specified table procedure on specified table
+   *
+   */
+  @Override
+  public void checkCanExecuteTableProcedure(
+          SystemSecurityContext context, CatalogSchemaTableName table, String procedure
+  ) {
+    RangerTrinoResource res = createResource(table);
+    if (
+            !hasPermission(res, context, TrinoAccessType.ALTER)
+            // && !hasPermission(createProcedureResource(procedure), context, TrinoAccessType.EXECUTE)
+    ) {
+      LOG.debug("RangerSystemAccessControl.checkCanExecuteTableProcedure(" + table.getSchemaTableName().getTableName() + ") denied");
+      AccessDeniedException.denyExecuteTableProcedure(table.getSchemaTableName().getTableName(), procedure);
     }
   }
 

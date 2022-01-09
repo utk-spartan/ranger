@@ -387,12 +387,18 @@ public class RangerSystemAccessControl
    * Check if identity is allowed to create the specified table with properties in a catalog.
    *
    */
+
   @Override
-  public void checkCanCreateTable(SystemSecurityContext context, CatalogSchemaTableName table, Map<String, Object> properties) {
+  public void checkCanCreateTable(SystemSecurityContext context, CatalogSchemaTableName table) {
     if (!hasPermission(createResource(table.getCatalogName(), table.getSchemaTableName().getSchemaName()), context, TrinoAccessType.CREATE)) {
       LOG.debug("RangerSystemAccessControl.checkCanCreateTable(" + table.getSchemaTableName().getTableName() + ") denied");
       AccessDeniedException.denyCreateTable(table.getSchemaTableName().getTableName());
     }
+  }
+  @Override
+  public void checkCanCreateTable(SystemSecurityContext context, CatalogSchemaTableName table, Map<String, Object> properties) {
+    this.checkCanCreateTable(context, table);
+    this.checkCanSetTableProperties(context, table, properties);
   }
 
   /**
@@ -561,6 +567,24 @@ public class RangerSystemAccessControl
     if (!hasPermission(res, context, TrinoAccessType.ALTER)) {
       LOG.debug("RangerSystemAccessControl.checkCanRenameColumn(" + table.getSchemaTableName().getTableName() + ") denied");
       AccessDeniedException.denyRenameColumn(table.getSchemaTableName().getTableName());
+    }
+  }
+
+  @Override
+  public void checkCanSetColumnComment(SystemSecurityContext context, CatalogSchemaTableName table) {
+    RangerTrinoResource res = createResource(table);
+    if (!hasPermission(res, context, TrinoAccessType.ALTER)) {
+      LOG.debug("RangerSystemAccessControl.checkCanSetColumnComment(" + table.getSchemaTableName().getTableName() + ") denied");
+      AccessDeniedException.denyCommentColumn(table.getSchemaTableName().getTableName());
+    }
+  }
+
+  @Override
+  public void checkCanUpdateTableColumns(SystemSecurityContext context, CatalogSchemaTableName table, Set<String> updatedColumnNames) {
+    RangerTrinoResource res = createResource(table);
+    if (!hasPermission(res, context, TrinoAccessType.ALTER)) {
+      LOG.debug("RangerSystemAccessControl.checkCanUpdateTableColumns(" + table.getSchemaTableName().getTableName() + ") denied");
+      AccessDeniedException.denyUpdateTableColumns(table.getSchemaTableName().getTableName(), updatedColumnNames);
     }
   }
 

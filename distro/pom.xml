@@ -52,6 +52,7 @@
                                 <configuration>
                                     <skipAssembly>false</skipAssembly>
                                     <descriptors>
+                                        <descriptor>src/main/assembly/hive-agent.xml</descriptor>
                                         <descriptor>src/main/assembly/admin-web.xml</descriptor>
                                         <descriptor>src/main/assembly/solr_audit_conf.xml</descriptor>
                                         <descriptor>src/main/assembly/usersync.xml</descriptor>
@@ -593,6 +594,7 @@
                                 <configuration>
                                     <skipAssembly>false</skipAssembly>
                                     <descriptors>
+                                        <descriptor>src/main/assembly/hive-agent.xml</descriptor>
                                         <descriptor>src/main/assembly/admin-web.xml</descriptor>
                                         <descriptor>src/main/assembly/solr_audit_conf.xml</descriptor>
                                         <descriptor>src/main/assembly/usersync.xml</descriptor>

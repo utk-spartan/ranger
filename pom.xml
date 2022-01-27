@@ -238,6 +238,7 @@
                 <module>credentialbuilder</module>
                 <module>embeddedwebserver</module>
                 <module>kms</module>
+                <module>hive-agent</module>
                 <module>security-admin</module>
                 <module>plugin-trino</module>
                 <module>ugsync</module>
@@ -248,6 +249,7 @@
                 <module>plugin-kms</module>
                 <module>tagsync</module>
                 <module>ranger-plugin-classloader</module>
+                <module>ranger-hive-plugin-shim</module>
                 <module>ranger-kms-plugin-shim</module>
                 <module>ranger-trino-plugin-shim</module>
                 <module>ranger-examples</module>
@@ -502,6 +504,7 @@
                 <module>credentialbuilder</module>
                 <module>embeddedwebserver</module>
                 <module>kms</module>
+                <module>hive-agent</module>
                 <module>security-admin</module>
                 <module>ugsync</module>
                 <module>ugsync/ldapconfigchecktool/ldapconfigcheck</module>
@@ -512,6 +515,7 @@
                 <module>plugin-kms</module>
                 <module>tagsync</module>
                 <module>ranger-plugin-classloader</module>
+                <module>ranger-hive-plugin-shim</module>
                 <module>ranger-kms-plugin-shim</module>
                 <module>ranger-examples</module>
                 <module>ranger-tools</module>

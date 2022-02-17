@@ -389,16 +389,11 @@ public class RangerSystemAccessControl
    */
 
   @Override
-  public void checkCanCreateTable(SystemSecurityContext context, CatalogSchemaTableName table) {
+  public void checkCanCreateTable(SystemSecurityContext context, CatalogSchemaTableName table, Map<String, Object> properties) {
     if (!hasPermission(createResource(table.getCatalogName(), table.getSchemaTableName().getSchemaName()), context, TrinoAccessType.CREATE)) {
       LOG.debug("RangerSystemAccessControl.checkCanCreateTable(" + table.getSchemaTableName().getTableName() + ") denied");
       AccessDeniedException.denyCreateTable(table.getSchemaTableName().getTableName());
     }
-  }
-  @Override
-  public void checkCanCreateTable(SystemSecurityContext context, CatalogSchemaTableName table, Map<String, Object> properties) {
-    this.checkCanCreateTable(context, table);
-    this.checkCanSetTableProperties(context, table, properties);
   }
 
   /**
@@ -426,7 +421,7 @@ public class RangerSystemAccessControl
 
   @Override
   public void checkCanSetTableProperties(
-          SystemSecurityContext context, CatalogSchemaTableName table, Map<String, Object> properties
+          SystemSecurityContext context, CatalogSchemaTableName table, Map<String, Optional<Object>> properties
   ) {
     RangerTrinoResource res = createResource(table);
     if (

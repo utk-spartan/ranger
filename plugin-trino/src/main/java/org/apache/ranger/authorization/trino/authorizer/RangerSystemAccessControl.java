@@ -48,6 +48,7 @@ import java.net.URL;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -176,6 +177,14 @@ public class RangerSystemAccessControl
   }
 
   @Override
+  public List<ViewExpression> getRowFilters(SystemSecurityContext context, CatalogSchemaTableName tableName)
+  {
+    return getRowFilter(context, tableName)
+            .map(Collections::singletonList)
+            .orElse(Collections.emptyList());
+  }
+
+  @Override
   public Optional<ViewExpression> getColumnMask(SystemSecurityContext context, CatalogSchemaTableName tableName, String columnName, Type type) {
     RangerTrinoAccessRequest request = createAccessRequest(
       createResource(tableName.getCatalogName(), tableName.getSchemaTableName().getSchemaName(),
@@ -222,6 +231,14 @@ public class RangerSystemAccessControl
     }
 
     return Optional.ofNullable(viewExpression);
+  }
+
+  @Override
+  public List<ViewExpression> getColumnMasks(SystemSecurityContext context, CatalogSchemaTableName tableName, String columnName, Type type)
+  {
+    return getColumnMask(context, tableName, columnName, type)
+            .map(Collections::singletonList)
+            .orElse(Collections.emptyList());
   }
 
   @Override

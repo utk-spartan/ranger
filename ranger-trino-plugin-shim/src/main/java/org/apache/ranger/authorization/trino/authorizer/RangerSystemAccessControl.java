@@ -604,6 +604,16 @@ public class RangerSystemAccessControl
     }
   }
 
+  @Override
+  public void checkCanExecuteFunction(SystemSecurityContext systemSecurityContext, CatalogSchemaRoutineName functionName) {
+    try {
+      activatePluginClassLoader();
+      systemAccessControlImpl.checkCanExecuteFunction(systemSecurityContext, functionName);
+    } finally {
+      deactivatePluginClassLoader();
+    }
+  }
+
   private void activatePluginClassLoader() {
     if (rangerPluginClassLoader != null) {
       rangerPluginClassLoader.activate();

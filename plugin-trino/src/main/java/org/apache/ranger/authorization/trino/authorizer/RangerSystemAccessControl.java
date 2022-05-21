@@ -696,6 +696,11 @@ public class RangerSystemAccessControl
     }
   }
 
+  @Override
+  public void checkCanExecuteFunction(SystemSecurityContext context, CatalogSchemaRoutineName function) {
+    checkCanExecuteFunction(context, function.toString());
+  }
+
   /** PROCEDURES **/
   @Override
   public void checkCanExecuteProcedure(SystemSecurityContext context, CatalogSchemaRoutineName procedure) {

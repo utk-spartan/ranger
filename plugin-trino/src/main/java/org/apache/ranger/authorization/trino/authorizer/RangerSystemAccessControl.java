@@ -22,6 +22,7 @@ import io.trino.spi.connector.CatalogSchemaName;
 import io.trino.spi.connector.CatalogSchemaRoutineName;
 import io.trino.spi.connector.CatalogSchemaTableName;
 import io.trino.spi.connector.SchemaTableName;
+import io.trino.spi.function.FunctionKind;
 import io.trino.spi.security.AccessDeniedException;
 import io.trino.spi.security.Identity;
 import io.trino.spi.security.TrinoPrincipal;
@@ -697,7 +698,8 @@ public class RangerSystemAccessControl
   }
 
   @Override
-  public void checkCanExecuteFunction(SystemSecurityContext context, CatalogSchemaRoutineName function) {
+  public void checkCanExecuteFunction(SystemSecurityContext context, FunctionKind functionKind, CatalogSchemaRoutineName function) {
+    //TODO{utk}: refactor implementation
     checkCanExecuteFunction(context, function.toString());
   }
 

@@ -117,7 +117,7 @@ CREATE TABLE `x_portal_user` (
   `user_src` int(11) NOT NULL DEFAULT '0',
   `notes` varchar(4000) DEFAULT NULL,
   `other_attributes` varchar(4000) DEFAULT NULL,
-  `sync_source` varchar(4000) DEFAULT NULL,
+  `sync_source` varchar(2000) DEFAULT NULL,
   `old_passwords` text DEFAULT NULL,
   `password_updated_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
